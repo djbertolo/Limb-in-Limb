@@ -162,8 +162,10 @@ function LimbCharacter.new(Character: Model, AdditionalLimbs, BlacklistLimbs, Ad
 	self.LimbsTable = GetLimbs(AdditionalLimbs, BlacklistLimbs)
 	self.AttributesTable = GetAttributes(AdditionalAttributes, BlacklistAttributes)
 
+	--Set Attributes for all Limbs
 	SetAttributes(self)
-
+	--Make table read only to prevent from bricking the object
+	table.freeze(self)
 	--Add Character to table so other scripts can access
 	LimbCharactersTable[Character] = self
 	--Remove Character from table upon Character removal
