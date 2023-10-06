@@ -56,10 +56,6 @@ Loops through parts of the Characters Body Parts Setting Values to each
 ]]--
 function CharacterFunctions.CharacterAdded(Character: Model, AdditionalParts, BlacklistParts, AdditionalAttributes, BlacklistAttributes)
 	if not Character then return end
-	repeat
-		RunService.Heartbeat:Wait()
-	until Character.Parent ~= nil
-	Character.Parent = workspace.Live
 	
 	local LimbsTable = {
 		"Head", "Right Arm", "Left Arm", "Torso", "Right Leg", "Left Leg",
