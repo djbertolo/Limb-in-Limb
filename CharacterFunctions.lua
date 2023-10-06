@@ -1,21 +1,14 @@
 --SERVICES--
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ServerStorage = game:GetService("ServerStorage")
 --FOLDERS--
 --MODULES--
 --VARIABLES + EVENT CONNECTIONS--
 --FUNCTIONS--
 local RagdollOn = function(Character: Model, Limb)
 	local LimbPart = Character:FindFirstChild(Limb)
-	if not LimbPart then
-		return
-	end
+	if not LimbPart then return end
 	local Joint: Motor6D = LimbPart:FindFirstChildOfClass("Motor6D")
-	if not Joint then
-		return
-	end
+	if not Joint then return end
 
 	local Attachment0 = Instance.new("Attachment")
 	Attachment0.Name = "CharacterFunctions_RagdollAttachment0"
@@ -40,18 +33,11 @@ end
 
 local RagdollOff = function(Character: Model, Limb)
 	local LimbPart = Character:FindFirstChild(Limb)
-	if not LimbPart then
-		return
-	end
+	if not LimbPart then return end
 	local Joint: Motor6D = LimbPart:FindFirstChildOfClass("Motor6D")
-	if not Joint then
-		return
-	end
-	local BallSocketConstraint: BallSocketConstraint =
-		LimbPart:FindFirstChild("CharacterFunctions_RagdollJoint") :: BallSocketConstraint
-	if not BallSocketConstraint then
-		return
-	end
+	if not Joint then return end
+	local BallSocketConstraint: BallSocketConstraint = LimbPart:FindFirstChild("CharacterFunctions_RagdollJoint"):: BallSocketConstraint
+	if not BallSocketConstraint then return end
 
 	local Attachment0 = BallSocketConstraint.Attachment0
 	local Attachment1 = BallSocketConstraint.Attachment1
@@ -63,50 +49,25 @@ local RagdollOff = function(Character: Model, Limb)
 	Joint.Enabled = true
 end
 --SCRIPT--
-CharacterFunctions = {}
+local CharacterFunctions = {}
 
 --[[
 Loops through parts of the Characters Body Parts Setting Values to each
-]]
---
-function CharacterFunctions.CharacterAdded(
-	Character: Model,
-	AdditionalParts,
-	BlacklistParts,
-	AdditionalAttributes,
-	BlacklistAttributes
-)
-	if not Character then
-		return
-	end
+]]--
+function CharacterFunctions.CharacterAdded(Character: Model, AdditionalParts, BlacklistParts, AdditionalAttributes, BlacklistAttributes)
+	if not Character then return end
 	repeat
 		RunService.Heartbeat:Wait()
 	until Character.Parent ~= nil
 	Character.Parent = workspace.Live
-
+	
 	local LimbsTable = {
-		"Head",
-		"Right Arm",
-		"Left Arm",
-		"Torso",
-		"Right Leg",
-		"Left Leg",
-		"RightUpperArm",
-		"RightLowerArm",
-		"RightHand",
-		"RightUpperLeg",
-		"RightLowerLeg",
-		"RightFoot",
-		"LeftUpperArm",
-		"LeftLowerArm",
-		"LeftHand",
-		"LeftUpperLeg",
-		"LeftLowerLeg",
-		"LeftFoot",
-		"UpperTorso",
-		"LowerTorso",
+		"Head", "Right Arm", "Left Arm", "Torso", "Right Leg", "Left Leg",
+		"RightUpperArm", "RightLowerArm", "RightHand", "RightUpperLeg", "RightLowerLeg", "RightFoot",
+		"LeftUpperArm", "LeftLowerArm", "LeftHand", "LeftUpperLeg", "LeftLowerLeg", "LeftFoot",
+		"UpperTorso", "LowerTorso"
 	}
-
+	
 	local AttributeTable = {
 		["IsALimb"] = true,
 		["Health"] = 100,
@@ -116,32 +77,26 @@ function CharacterFunctions.CharacterAdded(
 		["CanRegen"] = true,
 		["Enabled"] = true,
 	}
-
+	
 	local SetUpAttributes = function(Part: Part)
 		for Attribute, Value in pairs(AttributeTable) do
-			if BlacklistAttributes and table.find(BlacklistAttributes, Attribute) then
-				continue
-			end
-			Character:SetAttribute(Attribute, Value)
+			if BlacklistAttributes and table.find(BlacklistAttributes, Attribute) then continue end
+			Part:SetAttribute(Attribute, Value)
 		end
-		if not AdditionalAttributes or #AdditionalAttributes == 0 then
-			return
-		end
+		if not AdditionalAttributes or #AdditionalAttributes == 0 then return end
 		for Attribute, Value in pairs(AdditionalAttributes) do
-			Character:SetAttribute(Attribute, Value)
+			Part:SetAttribute(Attribute, Value)
 		end
 	end
-
+	
 	--Set Up Attributes based off of Default Values, Additional Attributes, and BlacklistAttributes
-	for Index, Child in pairs(Character:GetChildren()) do
-		if table.find(BlacklistParts, Child.Name) then
-			continue
-		end
+	for _, Child in pairs(Character:GetChildren()) do
+		if table.find(BlacklistParts, Child.Name) then continue end
 		if table.find(LimbsTable, Child.Name) or table.find(AdditionalParts, Child.Name) then
 			SetUpAttributes(Child)
 		end
 	end
-
+	
 	Character:SetAttribute("Loaded", true)
 end
 
@@ -153,37 +108,29 @@ function CharacterFunctions.DisableLimb(Character: Model, Limb)
 end
 
 function CharacterFunctions.EnableLimb(Character: Model, Limb)
-	function CharacterFunctions.DisableLimb(Character: Model, Limb)
-		local LimbPart = Character:FindFirstChild(Limb)
-		if LimbPart then
-			LimbPart:SetAttribute("LimbEnabled", true)
-		end
+	local LimbPart = Character:FindFirstChild(Limb)
+	if LimbPart then
+		LimbPart:SetAttribute("LimbEnabled", true)
 	end
 end
 
 function CharacterFunctions.HealLimb(Character: Model, Limb, HealAmount)
 	local LimbPart = Character:FindFirstChild(Limb)
-	if not Limb then
-		return
-	end
+	if not Limb then return end
 	if LimbPart:GetAttribute("Health") < LimbPart:GetAttribute("MaxHealth") then
 		LimbPart:SetAttribute("Health", LimbPart:GetAttribute("Health") + HealAmount)
 	end
 end
 
 function CharacterFunctions.RagdollOn(Character: Model, LimbsToRagdoll, LimbsToNotRagdoll)
-	if not Character then
-		return
-	end
+	if not Character then return end
 	if LimbsToRagdoll and #LimbsToRagdoll > 0 then
-		for Index, Limb in pairs(LimbsToRagdoll) do
-			if LimbsToNotRagdoll and table.find(LimbsToNotRagdoll, Limb) then
-				continue
-			end
+		for _, Limb in pairs(LimbsToRagdoll) do
+			if LimbsToNotRagdoll and table.find(LimbsToNotRagdoll, Limb) then continue end
 			RagdollOn(Character, Limb)
 		end
 	else
-		for Index, Child in pairs(Character:GetChildren()) do
+		for _, Child in pairs(Character:GetChildren()) do
 			if Child:GetAttribute("IsALimb") == true then
 				RagdollOn(Character, Child)
 			end
@@ -192,22 +139,16 @@ function CharacterFunctions.RagdollOn(Character: Model, LimbsToRagdoll, LimbsToN
 end
 
 function CharacterFunctions.RagdollOff(Character: Model, LimbsToUnragdoll, LimbsNotToUnragdoll)
-	if not Character then
-		return
-	end
+	if not Character then return end
 	if LimbsToUnragdoll and #LimbsToUnragdoll > 0 then
-		for Index, Limb in pairs(LimbsToUnragdoll) do
-			if LimbsNotToUnragdoll and table.find(LimbsNotToUnragdoll, Limb) then
-				continue
-			end
+		for _, Limb in pairs(LimbsToUnragdoll) do
+			if LimbsNotToUnragdoll and table.find(LimbsNotToUnragdoll, Limb) then continue end
 			RagdollOff(Character, Limb)
 		end
 	else
-		for Index, Child in pairs(Character:GetChildren()) do
+		for _, Child in pairs(Character:GetChildren()) do
 			if Child:GetAttribute("IsALimb") == true then
-				if LimbsNotToUnragdoll and table.find(LimbsNotToUnragdoll, Child.Name) then
-					continue
-				end
+				if LimbsNotToUnragdoll and table.find(LimbsNotToUnragdoll, Child.Name) then continue end
 				RagdollOff(Character, Child.Name)
 			end
 		end
@@ -223,7 +164,7 @@ function CharacterFunctions.RemoveLimb(Character: Model, Limb)
 		["Right Leg"] = "Right Hip",
 		["Left Leg"] = "Left Hip",
 	}
-	local RemoveMeansDeath = { "Head", "Torso", "UpperTorso", "LowerTorso" }
+	local RemoveMeansDeath = {"Head", "Torso", "UpperTorso", "LowerTorso"}
 	local LimbPart: Part = Character:FindFirstChild(Limb) :: Part
 	if LimbPart then
 		LimbPart.CanCollide = true
