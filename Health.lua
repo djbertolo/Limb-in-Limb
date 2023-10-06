@@ -4,19 +4,24 @@ local ServerStorage = game:GetService("ServerStorage")
 --FOLDERS--
 local PlayerModules = ServerStorage.PlayerModules
 --MODULES--
-local CharacterFunctions = require(PlayerModules.CharacterFunctions)
+local LimbCharacterClass = require(PlayerModules.LimbCharacter)
 --VARIABLES--
-local Character: Model = script.Parent
-
 local HEALTH_REGEN = 1
 
-local LimbsTable = CharacterFunctions.CharacterLimbsList[Character]
+local Character: Model = script.Parent
+local LimbCharactersTable = LimbCharacterClass.GetLimbCharactersTable()
+local LimbCharacter = LimbCharactersTable[Character]
 --FUNCTIONS--
 local Regeneration = function(DeltaTime: number)
 	for _, Child in pairs(Character:GetChildren()) do
-		if not table.find(LimbsTable, Child.Name) then continue end
-		if Child:GetAttribute("CanRegen") == false then continue end
-		CharacterFunctions.HealLimb(Character, Child.Name, HEALTH_REGEN * DeltaTime)
+		if not table.find(LimbCharacter.LimbsTable, Child.Name) then
+			continue
+		end
+		if Child:GetAttribute("CanRegen") == false then
+			continue
+		end
+
+		LimbCharacter:HealLimb(Child.Name, HEALTH_REGEN * DeltaTime)
 	end
 end
 
