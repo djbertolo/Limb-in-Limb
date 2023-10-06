@@ -1,4 +1,5 @@
 --SERVICES--
+local RunService = game:GetService("RunService")
 --FOLDERS--
 --MODULES--
 --VARIABLES + EVENT CONNECTIONS--
@@ -6,16 +7,39 @@ local LimbCharacter = {}
 LimbCharacter.__index = LimbCharacter
 
 local LimbCharactersTable = {}
+LimbCharacter.DefaultAttributesTable = {
+	["IsALimb"] = true,
+	["Health"] = 100,
+	["MaxHealth"] = 100,
+	["CanRegen"] = true,
+	["Enabled"] = true,
+}
+LimbCharacter.DefaultLimbsTable = {
+	"Head",
+	"Right Arm",
+	"Left Arm",
+	"Torso",
+	"Right Leg",
+	"Left Leg",
+	"RightUpperArm",
+	"RightLowerArm",
+	"RightHand",
+	"RightUpperLeg",
+	"RightLowerLeg",
+	"RightFoot",
+	"LeftUpperArm",
+	"LeftLowerArm",
+	"LeftHand",
+	"LeftUpperLeg",
+	"LeftLowerLeg",
+	"LeftFoot",
+	"UpperTorso",
+	"LowerTorso",
+}
 --FUNCTIONS--
 --Combines AttributesTable with AdditionalAttributes and removes BlacklistAttributes
 local GetAttributes = function(AdditionalAttributes, BlacklistAttributes)
-	local AttributesTable = {
-		["IsALimb"] = true,
-		["Health"] = 100,
-		["MaxStrength"] = 100,
-		["CanRegen"] = true,
-		["Enabled"] = true,
-	}
+	local AttributesTable = LimbCharacter.DefaultAttributesTable
 	--Add Additional Attributes
 	if AdditionalAttributes then
 		for AttributeName, Value in pairs(AdditionalAttributes) do
@@ -35,28 +59,7 @@ local GetAttributes = function(AdditionalAttributes, BlacklistAttributes)
 end
 --Combines LimbsTable with AdditionalLimbs and removes BlacklistLimbs
 local GetLimbs = function(AdditionalLimbs, BlacklistLimbs)
-	local LimbsTable = {
-		"Head",
-		"Right Arm",
-		"Left Arm",
-		"Torso",
-		"Right Leg",
-		"Left Leg",
-		"RightUpperArm",
-		"RightLowerArm",
-		"RightHand",
-		"RightUpperLeg",
-		"RightLowerLeg",
-		"RightFoot",
-		"LeftUpperArm",
-		"LeftLowerArm",
-		"LeftHand",
-		"LeftUpperLeg",
-		"LeftLowerLeg",
-		"LeftFoot",
-		"UpperTorso",
-		"LowerTorso",
-	}
+	local LimbsTable = LimbCharacter.DefaultLimbsTable
 	--Add Additional Limbs
 	if AdditionalLimbs then
 		for _, Limb in pairs(AdditionalLimbs) do
@@ -238,22 +241,45 @@ end
 
 function LimbCharacter:RemoveLimb(Limb)
 	local Humanoid: Humanoid = self.Character:WaitForChild("Humanoid") :: Humanoid
-	local JointTable = {
-		["Head"] = "Neck",
-		["Right Arm"] = "Right Shoulder",
-		["Left Arm"] = "Left Shoulder",
-		["Right Leg"] = "Right Hip",
-		["Left Leg"] = "Left Hip",
-	}
+
 	local RemoveMeansDeath = { "Head", "Torso", "UpperTorso", "LowerTorso" }
 	local LimbPart: Part = self.Character:FindFirstChild(Limb) :: Part
 	if LimbPart then
 		LimbPart.CanCollide = true
 	end
-	local RemoveJoint = self.Character:WaitForChild("Torso"):FindFirstChild(JointTable[Limb])
-	if RemoveJoint then
+
+	local Torso: Part = self.Character:FindFirstChild("Torso") or self.Character:FindFirstChild("LowerTorso")
+	if Torso.Name == "LowerTorso" then
+		local RemoveJoint
+		repeat
+			RemoveJoint = LimbPart:FindFirstChildOfClass("Motor6D")
+			if not RemoveJoint.Part0 then
+				return
+			end
+			if not table.find(self.LimbsTable, RemoveJoint.Part0.Name) then
+				RemoveJoint = nil
+			end
+			RunService.Heartbeat:Wait()
+		until RemoveJoint ~= nil
 		RemoveJoint:Destroy()
+	else
+		local RemoveJoint
+		for _, Child in pairs(Torso:GetChildren()) do
+			if not Child:IsA("Motor6D") then
+				return
+			end
+			if not Child.Part1 then
+				return
+			end
+			if Child.Part1.Name == LimbPart.Name then
+				RemoveJoint = Child
+			end
+		end
+		if RemoveJoint then
+			RemoveJoint:Destroy()
+		end
 	end
+
 	if table.find(RemoveMeansDeath, Limb) then
 		Humanoid.Health = 0
 	end
