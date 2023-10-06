@@ -2,9 +2,8 @@
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 --FOLDERS--
-local PlayerModules = ServerStorage.PlayerModules
 --MODULES--
-local LimbCharacterClass = require(PlayerModules.LimbCharacter)
+local LimbCharacterClass = require(ServerStorage.LimbCharacter)
 --VARIABLES--
 local HEALTH_REGEN = 1
 
