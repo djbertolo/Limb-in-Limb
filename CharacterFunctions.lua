@@ -61,14 +61,17 @@ end
 --SCRIPT--
 local CharacterFunctions = {}
 
+--Creates Table of Characters + Limb Parts for Health Script to work
+--This is so that Health can work for custom Limbs added in the "Additional Parts"
+CharacterFunctions["CharacterLimbsList"] = {}
 --[[
 Loops through parts of the Characters Body Parts Setting Values to each
 ]]
 --
 function CharacterFunctions.SetUpCharacter(
 	Character: Model,
-	AdditionalParts,
-	BlacklistParts,
+	AdditionalLimbs,
+	BlacklistLimbs,
 	AdditionalAttributes,
 	BlacklistAttributes
 )
@@ -108,6 +111,19 @@ function CharacterFunctions.SetUpCharacter(
 		["CanRegen"] = true,
 		["Enabled"] = true,
 	}
+	--Add Additional Limbs To LimbsTable
+	if AdditionalLimbs then
+		for _, Limb in pairs(AdditionalLimbs) do
+			table.insert(LimbsTable, Limb)
+		end
+	end
+
+	--Add Additional Attributes to AttributeTable
+	if AdditionalAttributes then
+		for AttributeName, Value in pairs(AdditionalAttributes) do
+			AttributeTable[AttributeName] = Value
+		end
+	end
 
 	local SetUpAttributes = function(Part: Part)
 		for Attribute, Value in pairs(AttributeTable) do
@@ -116,23 +132,24 @@ function CharacterFunctions.SetUpCharacter(
 			end
 			Part:SetAttribute(Attribute, Value)
 		end
-		if not AdditionalAttributes or #AdditionalAttributes == 0 then
-			return
-		end
-		for Attribute, Value in pairs(AdditionalAttributes) do
-			Part:SetAttribute(Attribute, Value)
-		end
 	end
 
 	--Set Up Attributes based off of Default Values, Additional Attributes, and BlacklistAttributes
 	for _, Child in pairs(Character:GetChildren()) do
-		if BlacklistAttributes and table.find(BlacklistParts, Child.Name) then
+		if BlacklistAttributes and table.find(BlacklistLimbs, Child.Name) then
 			continue
 		end
-		if table.find(LimbsTable, Child.Name) or (AdditionalParts and table.find(AdditionalParts, Child.Name)) then
+		if table.find(LimbsTable, Child.Name) then
 			SetUpAttributes(Child)
 		end
 	end
+
+	--Add Character + LimbsTable to CharacterLimbsTable for Health Script to work
+	CharacterFunctions.CharacterLimbsList[Character] = LimbsTable
+	--Add Listener to clear LimbsList of Character in Table upon Removal of Character
+	Character.Destroying:Connect(function()
+		CharacterFunctions.CharacterLimbsList[Character] = nil
+	end)
 
 	Character:SetAttribute("Loaded", true)
 end
