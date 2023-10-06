@@ -1,5 +1,4 @@
 --SERVICES--
-local RunService = game:GetService("RunService")
 --FOLDERS--
 --MODULES--
 --VARIABLES + EVENT CONNECTIONS--
