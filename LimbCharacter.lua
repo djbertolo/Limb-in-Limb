@@ -194,6 +194,17 @@ function LimbCharacter:EnableLimb(Limb)
 	end
 end
 
+function LimbCharacter:DamageLimb(Limb, DamageAmount)
+	local LimbPart = self.Character:FindFirstChild(Limb)
+	if not LimbPart then
+		return
+	end
+	LimbPart:SetAttribute("Health", LimbPart:GetAttribute("Health") - DamageAmount)
+	if LimbPart:GetAttribute("Health") < 0 then
+		LimbPart:SetAttribute("Health", 0)
+	end
+end
+
 function LimbCharacter:HealLimb(Limb, HealAmount)
 	local LimbPart = self.Character:FindFirstChild(Limb)
 	if not LimbPart then
