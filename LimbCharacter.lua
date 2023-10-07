@@ -215,15 +215,15 @@ function LimbCharacter:HealLimb(Limb, HealAmount)
 	end
 end
 
-function LimbCharacter:RagdollOn(LimbsToRagdoll, LimbsToNotRagdoll)
-	if LimbsToRagdoll and #LimbsToRagdoll > 0 then
-		for _, Limb in pairs(LimbsToRagdoll) do
+function LimbCharacter:RagdollOn(RagdollWhitelist, RagdollBlacklist)
+	if RagdollWhitelist and #RagdollWhitelist > 0 then
+		for _, Limb in pairs(RagdollWhitelist) do
 			RagdollOn(self.Character, Limb)
 		end
 	else
 		for _, Child in pairs(self.Character:GetChildren()) do
 			if Child:GetAttribute("IsALimb") == true then
-				if LimbsToNotRagdoll and table.find(LimbsToNotRagdoll, Child.Name) then
+				if RagdollBlacklist and table.find(RagdollBlacklist, Child.Name) then
 					continue
 				end
 				RagdollOn(self.Character, Child)
@@ -232,15 +232,15 @@ function LimbCharacter:RagdollOn(LimbsToRagdoll, LimbsToNotRagdoll)
 	end
 end
 
-function LimbCharacter:RagdollOff(LimbsToUnragdoll, LimbsNotToUnragdoll)
-	if LimbsToUnragdoll and #LimbsToUnragdoll > 0 then
-		for _, Limb in pairs(LimbsToUnragdoll) do
+function LimbCharacter:RagdollOff(RagdollWhitelist, RagdollBlacklist)
+	if RagdollWhitelist and #RagdollWhitelist > 0 then
+		for _, Limb in pairs(RagdollWhitelist) do
 			RagdollOff(self.Character, Limb)
 		end
 	else
 		for _, Child in pairs(self.Character:GetChildren()) do
 			if Child:GetAttribute("IsALimb") == true then
-				if LimbsNotToUnragdoll and table.find(LimbsNotToUnragdoll, Child.Name) then
+				if RagdollBlacklist and table.find(RagdollBlacklist, Child.Name) then
 					continue
 				end
 				RagdollOff(self.Character, Child.Name)
