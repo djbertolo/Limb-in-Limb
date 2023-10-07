@@ -256,6 +256,7 @@ function LimbCharacter:RemoveLimb(Limb)
 	local LimbPart: Part = self.Character:FindFirstChild(Limb) :: Part
 	if LimbPart then
 		LimbPart.CanCollide = true
+		LimbPart.Anchored = false
 	end
 
 	local Torso: Part = self.Character:FindFirstChild("Torso") or self.Character:FindFirstChild("LowerTorso")
