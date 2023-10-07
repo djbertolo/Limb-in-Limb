@@ -218,14 +218,14 @@ end
 function LimbCharacter:RagdollOn(LimbsToRagdoll, LimbsToNotRagdoll)
 	if LimbsToRagdoll and #LimbsToRagdoll > 0 then
 		for _, Limb in pairs(LimbsToRagdoll) do
-			if LimbsToNotRagdoll and table.find(LimbsToNotRagdoll, Limb) then
-				continue
-			end
 			RagdollOn(self.Character, Limb)
 		end
 	else
 		for _, Child in pairs(self.Character:GetChildren()) do
 			if Child:GetAttribute("IsALimb") == true then
+				if LimbsToNotRagdoll and table.find(LimbsToNotRagdoll, Child.Name) then
+					continue
+				end
 				RagdollOn(self.Character, Child)
 			end
 		end
@@ -235,9 +235,6 @@ end
 function LimbCharacter:RagdollOff(LimbsToUnragdoll, LimbsNotToUnragdoll)
 	if LimbsToUnragdoll and #LimbsToUnragdoll > 0 then
 		for _, Limb in pairs(LimbsToUnragdoll) do
-			if LimbsNotToUnragdoll and table.find(LimbsNotToUnragdoll, Limb) then
-				continue
-			end
 			RagdollOff(self.Character, Limb)
 		end
 	else
