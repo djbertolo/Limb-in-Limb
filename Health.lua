@@ -8,6 +8,9 @@ local LimbCharacterClass = require(ServerStorage.LimbCharacter)
 local HEALTH_REGEN = 1
 
 local Character: Model = script.Parent
+repeat
+	RunService.Heartbeat:Wait()
+until Character:GetAttribute("Loaded") == true
 local LimbCharactersTable = LimbCharacterClass.GetLimbCharactersTable()
 local LimbCharacter = LimbCharactersTable[Character]
 --FUNCTIONS--
@@ -28,7 +31,4 @@ local HealthManager = function(DeltaTime: number)
 	Regeneration(DeltaTime)
 end
 --SCRIPT--
-repeat
-	RunService.Heartbeat:Wait()
-until Character:GetAttribute("Loaded") == true
 RunService.Heartbeat:Connect(HealthManager)
